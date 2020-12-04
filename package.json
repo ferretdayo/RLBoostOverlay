@@ -1,0 +1,29 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "node contrib/versioner.js && npm run compile-css && npm run transpile-js && node contrib/qTemplate.js src/overlay.html dist/overlay.html",
+    "compile-css": "cd node_modules/.bin && sass.cmd ../../src/sass/main.sass ../../out/css/main.css && uglifycss.cmd ../../out/css/main.css > ../../out/css/main.min.css",
+    "compile-js": "",
+    "transpile-js": "cd node_modules/.bin && babel --source-maps inline --config-file ../../babel.config.json ../../src/js --out-file ../../out/js/base.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/plugin-proposal-private-methods": "^7.7.4",
+    "@babel/polyfill": "^7.7.0",
+    "sass": "^1.24.0",
+    "uglify-js": "^3.7.3",
+    "uglifycss": "0.0.29"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.7"
+  }
+}
