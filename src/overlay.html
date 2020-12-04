@@ -12,114 +12,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SOS - Rocket League OBS Browser Source Overlay</title>
-    <style>
-        ${require('../out/css/main.min.css')}
-    </style>
+  <meta charset="UTF-8">
+  <title>SOS - Rocket League OBS Browser Source Overlay</title>
+  <style>
+      ${require('../out/css/main.min.css')}
+  </style>
 </head>
 <body>
-    <div class="page-container">
-        <div class="waiting-for-websocket">
-            <div class="technical-difficulties hidden"></div>
-            <div class="text">
-                Waiting for Websocket Server to connect...
-            </div>
-        </div>
+  <div class="page-container">
+    <div class="waiting-for-websocket">
+      <div class="technical-difficulties hidden"></div>
+      <div class="text">
+        Waiting for Websocket Server to connect...
+      </div>
     </div>
-    <div class="player-card">
-        <div class="color-bg" style="background: #0090d3"></div>
-        <div class="name-color-bg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="982px" height="145px">
-                <rect fill-rule="evenodd"  fill="#0090d3" width="982" height="145"/>
-            </svg>
-        </div>
-        <div class="name-black-bg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="982px" height="145px">
-                <rect fill-rule="evenodd"  fill="#000" width="982" height="145"/>
-            </svg>
-        </div>
-        <div class="name">NRG JSTN. WIDEPEEPOHAPPYNRG JSTN. WIDEPEEPOHAPPYNRG JSTN. WIDEPEEPOHAPPY</div>
-        <table class="stat-table">
-            <tr>
-                <th>Score</th>
-                <th>Goals</th>
-                <th>Shots</th>
-                <th>Assists</th>
-                <th>Saves</th>
-            </tr>
-            <tr>
-                <td class="score"></td>
-                <td class="goals"></td>
-                <td class="shots"></td>
-                <td class="assists"></td>
-                <td class="saves"></td>
-            </tr>
-        </table>
-        <div class="boost-empty-bg"></div>
-        <div class="boost-bg"></div>
-        <div class="boost"></div>
+  </div>
+  <div class="players_boost">
+    <div class="teamA">
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
     </div>
-    <script>${require('vendor/jquery-3.4.1/jquery-3.4.1.min.js')}</script>
-    <script>${require('../out/js/base.js')}</script>
-    <script>
-        //!!! Register the websocket listeners before attempting to connect
-        WsSubscribers.subscribe("ws", "open", function() {
-            $(".waiting-for-websocket").addClass("hidden");
-            WsSubscribers.send("cb", "first_connect", {
-                'name': 'Scorebug',
-                'version': ${require('../version.txt')}
-            });
-            setInterval(function () {
-                WsSubscribers.send("cb", "heartbeat", "heartbeat");
-            }, 1000);
-        });
+    <div class="teamB">
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
+      <div class="player">
+        <div class="player_name"></div>
+        <div class="player_boost"></div>
+        <div class="player_boost_bg"></div>
+      </div>
+    </div>
+  </div>
+  <script>${require('vendor/jquery-3.4.1/jquery-3.4.1.min.js')}</script>
+  <script>${require('../out/js/base.js')}</script>
+  <script>
+    //!!! Register the websocket listeners before attempting to connect
+    WsSubscribers.subscribe("ws", "open", function() {
+      $(".waiting-for-websocket").addClass("hidden");
+      WsSubscribers.send("cb", "first_connect", {
+        'name': 'Scorebug',
+        'version': ${require('../version.txt')}
+      });
+      setInterval(function () {
+        WsSubscribers.send("cb", "heartbeat", "heartbeat");
+      }, 1000);
+    });
 
-        WsSubscribers.subscribe("ws", "open", function() {
-            $(".waiting-for-websocket").addClass("hidden");
-        });
+    WsSubscribers.subscribe("ws", "open", function() {
+      $(".waiting-for-websocket").addClass("hidden");
+    });
 
-        WsSubscribers.subscribe("ws", "error", function() {
-            $(".waiting-for-websocket .text").text("[002] There has been an error with the Rocket League connection. Please stand by");
-            $(".waiting-for-websocket").removeClass("hidden");
-        });
+    WsSubscribers.subscribe("ws", "error", function() {
+      $(".waiting-for-websocket .text").text("[002] There has been an error with the Rocket League connection. Please stand by");
+      $(".waiting-for-websocket").removeClass("hidden");
+    });
 
-        WsSubscribers.subscribe("ws", "close", function() {
-            $(".waiting-for-websocket .text").text("[004] Connection to Rocket League has gone away. Please stand by");
-            $(".waiting-for-websocket, .technical-difficulties").removeClass("hidden");
-        });
+    WsSubscribers.subscribe("ws", "close", function() {
+      $(".waiting-for-websocket .text").text("[004] Connection to Rocket League has gone away. Please stand by");
+      $(".waiting-for-websocket, .technical-difficulties").removeClass("hidden");
+    });
 
-        WsSubscribers.init(49322, false, [
-            "game:update_tick",
-            "cb:heartbeat"
-        ]);
-    </script>
-    <script>
-        WsSubscribers.subscribe("game", "update_state", (d) => {
-            let playerTarget = d['players'][d['game']['target']];
-            if (!playerTarget) {
-                $('.player-card').hide();
-                return;
-            }
-            $('.player-card').show();
-            $('.player-card .name').text(playerTarget.name);
-            $('.player-card .score').text(playerTarget.score);
-            $('.player-card .goals').text(playerTarget.goals);
-            $('.player-card .shots').text(playerTarget.shots);
-            $('.player-card .assists').text(playerTarget.assists);
-            $('.player-card .saves').text(playerTarget.saves);
-            $('.player-card .boost').text(playerTarget.boost);
-            $('.player-card .boost-bg').css('width', playerTarget.boost + '%');
-
-            if (playerTarget.team === 0) {
-                $('.player-card .color-bg').css('background', '#0090d3');
-                $('.player-card .name-color-bg path').attr('fill', '#0090d3');
-            } else {
-                $('.player-card .color-bg').css('background', '#f26522');
-                $('.player-card .name-color-bg path').attr('fill', '#f26522');
-            }
-        });
-    </script>
-    <script>${require('sos-plugins/testing/js/testing.js')}</script>
+    WsSubscribers.init(49322, false, [
+      "game:update_tick",
+      "cb:heartbeat"
+    ]);
+  </script>
+  <script>
+    WsSubscribers.subscribe("game", "update_state", (data) => {
+      const teamA = [];
+      const teamB = [];
+      // 各チームごとにユーザを分ける
+      for(player in data.players) {
+        if (data.players[player].team === 0) {
+          teamA.push(data.players[player]);
+        } else if (data.players[player].team === 1) {
+          teamB.push(data.players[player]);
+        }
+      }
+      // 各チームのユーザに対して現在の情報を表示
+      teamA.forEach((player, index) => {
+        $('.teamA .player .player_boost').eq(index).text(player.boost);
+        $('.teamA .player .player_name').eq(index).text(player.name);
+        $('.teamA .player .player_boost_bg').eq(index).css('width', player.boost + '%');
+      })
+      teamB.forEach((player, index) => {
+        $('.teamB .player .player_boost').eq(index).text(player.boost);
+        $('.teamB .player .player_name').eq(index).text(player.name);
+        $('.teamB .player .player_boost_bg').eq(index).css('width', player.boost + '%');
+      })
+    })
+  </script>
+  <script>${require('sos-plugins/testing/js/testing.js')}</script>
 </body>
 </html>
